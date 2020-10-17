@@ -12,6 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -20,20 +21,23 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public class MainBotController extends TelegramLongPollingBot {
-    private static final String URL_TO_DB = "C:\\Users\\Admin\\IdeaProjects\\MyPointBot\\MultiBot-master\\src\\main\\resources\\Data bases\\sessionStates.json";
+public class MainBotController extends TelegramLongPollingBot implements Runnable {
+    private static final String URL_TO_DB = "C:\\ProgJava\\Bot\\MultiBot-master\\src\\main\\resources\\Data bases\\sessionStates.json";
     private static final Gson jsonSessionDeserializer = new GsonBuilder().setPrettyPrinting().
             registerTypeAdapter(Session.class, new SessionDeserializer()).create();
     private static final Map<Long, User> sessionState;
 
     static {
         sessionState = uploadInfo(Paths.get(URL_TO_DB));
+        Thread orderEx = new Thread(new MainBotController());
+        orderEx.start();
     }
 
     //References for sessions
-    private final BiConsumer<Message, User> talkAboutWeather = this::talkAboutWeather;
+    private final BiConsumer<Message, User> setStatus = this::talkAboutWeather;
     private final BiConsumer<Message, User> letsTalk = this::letsTalk;
     private final BiConsumer<Message, User> continueSession = this::continueSession;
     private final BiConsumer<Message, User> goHome = this::goHome;
@@ -41,11 +45,37 @@ public class MainBotController extends TelegramLongPollingBot {
     private final BiConsumer<SendMessage, User> buttonsWeather = this::buttonsWeather;
     private final BiConsumer<SendMessage, User> buttonsLetsTalk = this::buttonsLetsTalk;
     private final BiConsumer<SendMessage, User> defaultKeyboard = this::setMainKeyBoard;
-    private final Map<String, BiConsumer<Message, User>> middleOpers = Map.of("online/offline", talkAboutWeather,
-            "свободен/занят", letsTalk);
+    private final Map<String, BiConsumer<Message, User>> middleOpers = Map.of("online/offline", setStatus,
+            "free/busy", letsTalk);
+
+
+    @Override
+    public void run() {
+        while (true) {
+            User user = null;
+            while (user == null) {
+                user = sessionState.values().stream().filter(o -> !o.isBusy() && o.isOnlineStatus()).findFirst().orElse(null);
+            }
+            SendMessage sm = new SendMessage();
+            sm.setChatId(user.getUserChatId());
+            sm.setText("Заказ на доставку холодильника");
+            try {
+                execute(sm);
+            } catch (TelegramApiException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     @Override
     public void onUpdateReceived(Update update) {
+        String infoUpdate = update.toString();
+        String userLocation = null;
+        Matcher matcher = Pattern.compile("location=Location\\{longitude=(?<lon>.+?,)(?<lat>.+(?=\\}))}").matcher(infoUpdate);
+        if(matcher.find()) {
+            System.out.println("Location : " + matcher.group());
+
+        }
         Message message = update.getMessage();
         String userMessage = message.getText().toLowerCase().trim();
         System.out.println("Активность от " + sessionState.get(message.getChatId()));
@@ -96,28 +126,28 @@ public class MainBotController extends TelegramLongPollingBot {
         homeRow.add("|HOME|");
         rkm.setResizeKeyboard(true);
         KeyboardRow k_r1 = new KeyboardRow();
-        k_r1.add("Свободен");
+        k_r1.add("Free");
         KeyboardRow k_r2 = new KeyboardRow();
-        k_r2.add("Занят");
+        k_r2.add("Busy");
         rkm.setResizeKeyboard(true);
         rkm.setKeyboard(List.of(homeRow, k_r1, k_r2));
         sendMessage.setReplyMarkup(rkm);
     }
 
     private void talkAboutWeather(Message message, User user) {
-        user.setCurrentSession(new WeatherSession());
-        sendMessage(message, user.getCurrentSession().nextStep(message.getText(), message), buttonsWeather);
+        user.setCurrentSession(new OnlineSession());
+        sendMessage(message, user.getCurrentSession().nextStep(message.getText(), message, user), buttonsWeather);
         recordInfo(Paths.get(URL_TO_DB));
     }
 
     private void letsTalk(Message message, User user) {
-        user.setCurrentSession(new TalkingSession());
-        sendMessage(message, user.getCurrentSession().nextStep(message.getText(), message), buttonsLetsTalk);
+        user.setCurrentSession(new BusyFreeSession());
+        sendMessage(message, user.getCurrentSession().nextStep(message.getText(), message, user), buttonsLetsTalk);
         recordInfo(Paths.get(URL_TO_DB));
     }
 
     private void continueSession(Message message, User user) {
-        sendMessage(message, user.getCurrentSession().nextStep(message.getText(), message), user.getCurrentSession().getButtonsMarkUp());
+        sendMessage(message, user.getCurrentSession().nextStep(message.getText(), message, user), user.getCurrentSession().getButtonsMarkUp());
         recordInfo(Paths.get(URL_TO_DB));
         if (!user.getCurrentSession().isSessionOpened())
             sendMessage(message, "Выберите операцию", defaultKeyboard);
@@ -163,7 +193,7 @@ public class MainBotController extends TelegramLongPollingBot {
         weatherKey.add(new KeyboardButton("Online/Offline"));
 
         KeyboardRow letsTalk = new KeyboardRow();
-        letsTalk.add("Свободен/Занят");
+        letsTalk.add("Free/Busy");
 
         List<KeyboardRow> keys = new ArrayList<>();
         keys.add(weatherKey);
@@ -201,9 +231,10 @@ public class MainBotController extends TelegramLongPollingBot {
     }
 
     private static Map<Long, User> uploadInfo(Path path) {
-        Type mapType = new TypeToken<HashMap<Long, User>>() {}.getType();
+        Type mapType = new TypeToken<HashMap<Long, User>>() {
+        }.getType();
         Map<Long, User> usersDb = Collections.emptyMap();
-        try (FileReader reader = new FileReader(path.toString())){
+        try (FileReader reader = new FileReader(path.toString())) {
             usersDb = jsonSessionDeserializer.fromJson(reader, mapType);
         } catch (IOException e) {
             e.printStackTrace();
@@ -218,4 +249,5 @@ public class MainBotController extends TelegramLongPollingBot {
             e.printStackTrace();
         }
     }
+
 }

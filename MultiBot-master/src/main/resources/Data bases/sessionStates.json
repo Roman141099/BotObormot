@@ -6,17 +6,23 @@
     "Session settings": {
       "defMessageSent": false,
       "sessionOpened": false,
-      "Session type endpoint": "Main.UBot.com.TalkingSession"
-    }
+      "Session type endpoint": "Main.UBot.com.BusyFreeSession"
+    },
+    "Online": true,
+    "Busy": false,
+    "Has geolocation": false
   },
   "1082560005": {
     "User firstname": "Roman",
     "User lastname": "Unknown",
     "User ID": 1082560005,
     "Session settings": {
-      "defMessageSent": false,
+      "choosedStatus": false,
       "sessionOpened": false,
-      "Session type endpoint": "Main.UBot.com.TalkingSession"
-    }
+      "Session type endpoint": "Main.UBot.com.OnlineSession"
+    },
+    "Online": false,
+    "Busy": true,
+    "Has geolocation": false
   }
 }

@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-public class TalkingSession extends Session{
+public class BusyFreeSession extends Session{
     private boolean defMessageSent;
     private transient List<String> buttons = new ArrayList<>(Collections.singletonList("|HOME|"));
     private final transient BiConsumer<SendMessage, User> buttonsMarkUp = this::setButtons;
@@ -27,17 +27,26 @@ public class TalkingSession extends Session{
     }
 
     @Override
-    public String nextStep(String inputTxt, Message message) {
+    public String nextStep(String inputTxt, Message message, User user) {
         inputTxt = inputTxt.toLowerCase();
         if(!defMessageSent){
             defMessageSent = true;
             return "Выберите вариант занятости";
         }
-        if(inputTxt.equals("свободен") || inputTxt.equals("занят")){
-            terminateAllProcesses();
-            return "Ваш статус занятости был переключен на " + inputTxt;
+        switch (inputTxt){
+            case "busy" :
+                user.setBusy(true);
+                System.out.println(user);
+                terminateAllProcesses();
+                return "Статус занятости установлен в 'занят'";
+            case "free" :
+                user.setBusy(false);
+                System.out.println(user);
+                terminateAllProcesses();
+                return "Статус занятости установлен в 'свободен'";
+            default:
+                return "Непонятная для меня операция.";
         }
-        else return "Я не понимаю";
     }
 
     @Override

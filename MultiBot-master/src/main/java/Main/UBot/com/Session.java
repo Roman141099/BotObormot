@@ -26,7 +26,7 @@ public abstract class Session {
     }
 
     //The next step in all sessions
-    public abstract String nextStep(String inputTxt, Message message);
+    public abstract String nextStep(String inputTxt, Message message, User user);
 
     public abstract void terminateAllProcesses();
 

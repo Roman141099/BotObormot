@@ -11,6 +11,15 @@ public class User {
     private final Long userChatId;
     @SerializedName("Session settings")
     private Session currentSession;
+    @SerializedName("Online")
+    private boolean onlineStatus;
+    @SerializedName("Busy")
+    private boolean isBusy;
+    @SerializedName("Has geolocation")
+    private boolean hasGeo;
+    @SerializedName("Stream geo point")
+    private String geoPoint;
+
 
     public User() {
         userChatId = 0L;
@@ -19,8 +28,32 @@ public class User {
         lastName = "DefaultLastName";
     }
 
+    public boolean isHasGeo() {
+        return hasGeo;
+    }
+
+    public void setHasGeo(boolean hasGeo) {
+        this.hasGeo = hasGeo;
+    }
+
     public User(Long userChatId) {
         this.userChatId = userChatId;
+    }
+
+    public boolean isOnlineStatus() {
+        return onlineStatus;
+    }
+
+    public void setOnlineStatus(boolean onlineStatus) {
+        this.onlineStatus = onlineStatus;
+    }
+
+    public boolean isBusy() {
+        return isBusy;
+    }
+
+    public void setBusy(boolean busy) {
+        isBusy = busy;
     }
 
     public User(Long userChatId, Session currentSession, String firstName, String lastName) {

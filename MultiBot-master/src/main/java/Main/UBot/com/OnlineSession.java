@@ -14,7 +14,7 @@ import java.io.FileReader;
 import java.util.*;
 import java.util.function.BiConsumer;
 
-public class WeatherSession extends Session {
+public class OnlineSession extends Session {
     private boolean choosedStatus;
     transient public static final String[] wrongNameCityMessage = {
             "Unknown city, try again", "Please, verify your city name",
@@ -23,11 +23,11 @@ public class WeatherSession extends Session {
     private transient List<String> buttons = new ArrayList<>(Collections.singletonList("|HOME|"));
     private final transient BiConsumer<SendMessage, User> buttonsMarkUp = this::setButtons;
 
-    public WeatherSession() {
+    public OnlineSession() {
         super();
     }
 
-    public WeatherSession(boolean sessionOpened, boolean choosedStatus) {
+    public OnlineSession(boolean sessionOpened, boolean choosedStatus) {
         super(sessionOpened);
         this.choosedStatus = choosedStatus;
     }
@@ -38,15 +38,31 @@ public class WeatherSession extends Session {
     }
 
     @Override
-    public String nextStep(String inputTxt, Message message) {
+    public String nextStep(String inputTxt, Message message, User user) {
         if (!choosedStatus) {
             choosedStatus = true;
             return "Выберите свой статус.";
         }
-        if (inputTxt.equals("Online") || inputTxt.equals("Offline")) {
-            terminateAllProcesses();
-            return "Ваш статус был переключен на " + inputTxt;
-        } else return "Непонятная для меня операция.";
+        switch (inputTxt) {
+            case "Online":
+                if (user.isOnlineStatus()) {
+                    terminateAllProcesses();
+                    return "Ваш статус уже 'online'";
+                }
+                user.setOnlineStatus(true);
+                terminateAllProcesses();
+                return "Ваш статус переключен в 'online'";
+            case "Offline":
+                if (!user.isOnlineStatus()) {
+                    terminateAllProcesses();
+                    return "Ваш статус уже 'offline'";
+                }
+                user.setOnlineStatus(false);
+                terminateAllProcesses();
+                return "Ваш статус переключен в 'offline'";
+            default:
+                return "Непонятная для меня операция.";
+        }
     }
 
     private void setButtons(SendMessage sendMessage, User user) {
@@ -58,18 +74,6 @@ public class WeatherSession extends Session {
         rpl.setKeyboard(List.of(k_r1, k_r2));
         rpl.setResizeKeyboard(true);
         sendMessage.setReplyMarkup(rpl);
-}
-
-    private void parseAndSendSticker(Message message, WeatherParser resultForecast)
-            throws FileNotFoundException, TelegramApiException {
-        Gson wG = new Gson();
-        JsonObject j_Obj = wG.fromJson(
-                new FileReader("src/main/resources/Weather stickers/stickers.json"), JsonObject.class);
-        SendSticker sendSticker = new SendSticker();
-        sendSticker.setChatId(message.getChatId());
-        sendSticker.setSticker(j_Obj.get(resultForecast.getIcon()).
-                getAsString());
-        new MainBotController().execute(sendSticker);
     }
 
     @Override
@@ -79,7 +83,7 @@ public class WeatherSession extends Session {
 
     @Override
     public String toString() {
-        return "WeatherSession{" +
+        return "OnlineSession{" +
                 "isChoosedCity=<" + choosedStatus +
                 ">, sessionOpened=<" + sessionOpened +
                 ">}";
