@@ -1,0 +1,22 @@
+{
+  "914949400": {
+    "User firstname": "Павел",
+    "User lastname": "Unknown",
+    "User ID": 914949400,
+    "Session settings": {
+      "defMessageSent": false,
+      "sessionOpened": false,
+      "Session type endpoint": "Main.UBot.com.TalkingSession"
+    }
+  },
+  "1082560005": {
+    "User firstname": "Roman",
+    "User lastname": "Unknown",
+    "User ID": 1082560005,
+    "Session settings": {
+      "defMessageSent": false,
+      "sessionOpened": false,
+      "Session type endpoint": "Main.UBot.com.TalkingSession"
+    }
+  }
+}

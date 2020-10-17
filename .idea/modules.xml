@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/MultiBot-master/BotObormot.iml" filepath="$PROJECT_DIR$/MultiBot-master/BotObormot.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/MyPointBot.iml" filepath="$PROJECT_DIR$/.idea/MyPointBot.iml" />
+    </modules>
+  </component>
+</project>
