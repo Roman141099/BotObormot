@@ -10,7 +10,7 @@ public class Main {
         Thread botThread = new Thread(botRun);
         botThread.start();
     }
-    private static Runnable botRun = () -> {
+    private static final Runnable botRun = () -> {
         ApiContextInitializer.init();
         TelegramBotsApi tgBotsAPI = new TelegramBotsApi();
         MainBotController currentBot = new MainBotController();

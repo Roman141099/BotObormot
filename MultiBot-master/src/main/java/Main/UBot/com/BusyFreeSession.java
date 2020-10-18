@@ -18,9 +18,9 @@ public class BusyFreeSession extends Session{
     private void setButtons(SendMessage sendMessage, User user) {
         ReplyKeyboardMarkup rpl = new ReplyKeyboardMarkup();
         KeyboardRow k_r1 = new KeyboardRow();
-        k_r1.add("Online");
+        k_r1.add("Free");
         KeyboardRow k_r2 = new KeyboardRow();
-        k_r2.add("Offline");
+        k_r2.add("Busy");
         rpl.setKeyboard(List.of(k_r1, k_r2));
         rpl.setResizeKeyboard(true);
         sendMessage.setReplyMarkup(rpl);

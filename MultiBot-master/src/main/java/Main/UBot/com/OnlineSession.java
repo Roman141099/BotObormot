@@ -41,7 +41,7 @@ public class OnlineSession extends Session {
     public String nextStep(String inputTxt, Message message, User user) {
         if (!choosedStatus) {
             choosedStatus = true;
-            return "Выберите свой статус.";
+            return "Выберите свой сетевой статус.";
         }
         switch (inputTxt) {
             case "Online":

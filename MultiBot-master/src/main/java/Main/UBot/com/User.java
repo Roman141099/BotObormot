@@ -19,6 +19,9 @@ public class User {
     private boolean hasGeo;
     @SerializedName("Stream geo point")
     private String geoPoint;
+    @SerializedName("Got order")
+    private boolean gotOrder;
+
 
 
     public User() {
@@ -28,7 +31,23 @@ public class User {
         lastName = "DefaultLastName";
     }
 
-    public boolean isHasGeo() {
+    public String getGeoPoint() {
+        return geoPoint;
+    }
+
+    public void setGeoPoint(String geoPoint) {
+        this.geoPoint = geoPoint;
+    }
+
+    public boolean isGotOrder() {
+        return gotOrder;
+    }
+
+    public void setGotOrder(boolean gotOrder) {
+        this.gotOrder = gotOrder;
+    }
+
+    public boolean hasGeo() {
         return hasGeo;
     }
 
@@ -56,13 +75,6 @@ public class User {
         isBusy = busy;
     }
 
-    public User(Long userChatId, Session currentSession, String firstName, String lastName) {
-        this.userChatId = userChatId;
-        this.currentSession = currentSession;
-        this.firstName = firstName;
-        this.lastName = lastName;
-    }
-
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
@@ -87,7 +99,16 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{id=" + userChatId + ", current session=" + currentSession + '}';
+        return "User{" +
+                "firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", userChatId=" + userChatId +
+                ", currentSession=" + currentSession +
+                ", onlineStatus=" + onlineStatus +
+                ", isBusy=" + isBusy +
+                ", hasGeo=" + hasGeo +
+                ", geoPoint='" + geoPoint + '\'' +
+                '}';
     }
 
     public String getLastName() {

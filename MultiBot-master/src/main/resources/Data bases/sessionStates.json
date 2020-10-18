@@ -4,25 +4,29 @@
     "User lastname": "Unknown",
     "User ID": 914949400,
     "Session settings": {
-      "defMessageSent": false,
+      "orderConfirmed": false,
       "sessionOpened": false,
-      "Session type endpoint": "Main.UBot.com.BusyFreeSession"
+      "Session type endpoint": "Main.UBot.com.OrderSession"
     },
     "Online": true,
-    "Busy": false,
-    "Has geolocation": false
+    "Busy": true,
+    "Has geolocation": false,
+    "Stream geo point": "Location{longitude\u003d50.13809, latitude\u003d53.198868}",
+    "Got order": true
   },
   "1082560005": {
     "User firstname": "Roman",
     "User lastname": "Unknown",
     "User ID": 1082560005,
     "Session settings": {
-      "choosedStatus": false,
+      "orderConfirmed": false,
       "sessionOpened": false,
-      "Session type endpoint": "Main.UBot.com.OnlineSession"
+      "Session type endpoint": "Main.UBot.com.OrderSession"
     },
-    "Online": false,
+    "Online": true,
     "Busy": true,
-    "Has geolocation": false
+    "Has geolocation": false,
+    "Stream geo point": "Location{longitude\u003d50.235405, latitude\u003d53.211044}",
+    "Got order": true
   }
 }
